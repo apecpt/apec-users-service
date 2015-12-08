@@ -42,4 +42,20 @@ trait UsersComponent extends TablesSchema {
     object userProfiles extends TableQuery(new UserProfiles(_)) {
       val byUser = this.findBy(_.userId)
     }
+    
+    class UserEmails(tag: Tag) extends Table[UserEmail](tag, "user_emails") {
+      def userId = column[UserId]("user_id")
+      def user = foreignKey("user_id_fk", userId, userEntities)(_.id, ForeignKeyAction.Cascade, ForeignKeyAction.Cascade)
+      def email = column[String]("email")
+      def emailIndex = index("user_email_idx", email, true)
+      def primary = column[Boolean]("primary")
+      def verified = column[Boolean]("verified")
+      def verificationToken = column[Option[String]]("verification_token")
+      def requestDate = column[Option[DateTime]]("request_date")
+      def * = (userId, email, primary, verified, verificationToken, requestDate) <> (UserEmail.tupled, UserEmail.unapply _)
+    }
+    
+    object userEmails extends TableQuery(new UserEmails(_)) {
+      def byUser(userId: UserId) = this.filter(_.userId === userId)
+    }
 }

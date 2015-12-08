@@ -5,5 +5,5 @@ case class UserEntity(id: UserId, username: String, password: Array[Byte], creat
 
 case class UserProfile(userId: UserId, firstName: String, lastName: String, displayName: String, country: String, manualVerification:Boolean, verificationDocumentUrl: Option[String], verifiedAt: Option[DateTime])
 
-case class UserEmail(email: String, primary: Boolean, verified: Boolean, verificationToken: Option[String], requestDate: Option[DateTime])
+case class UserEmail(userId: UserId, email: String, primary: Boolean, verified: Boolean, verificationToken: Option[String], requestDate: Option[DateTime])
 
