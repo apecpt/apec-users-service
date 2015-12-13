@@ -6,12 +6,12 @@ import pt.org.apec.services.users.common._
 import org.joda.time.DateTime
 
 
-trait UsersComponent extends TablesSchema {
-  this : DriverComponent[JdbcDriver] with JodaSupport[JdbcDriver] =>
+trait UsersComponent[DT <: JdbcDriver] extends TablesSchema {
+  this : DriverComponent[DT] with JodaSupport[DT] =>
     import driver.api._
     import Joda._
     
-    class UserEntitiesTable(tag: Tag) extends Table[UserEntity](tag, "user_entities") {
+    class UserEntities(tag: Tag) extends Table[UserEntity](tag, "user_entities") {
       def id = column[UserId]("id", O.PrimaryKey, O.AutoInc)
       def username = column[String]("username")
       def hashedPassword = column[Array[Byte]]("hashed_password")
@@ -22,7 +22,7 @@ trait UsersComponent extends TablesSchema {
       def * = (id, username, hashedPassword, createdAt, updatedAt, isActive) <> (UserEntity.tupled, UserEntity.unapply _)
     }
 
-    object userEntities extends TableQuery(new UserEntitiesTable(_)) {
+    object userEntities extends TableQuery(new UserEntities(_)) {
       def activeUsers = this.filter(_.isActive === true)
     }
     
@@ -58,4 +58,6 @@ trait UsersComponent extends TablesSchema {
     object userEmails extends TableQuery(new UserEmails(_)) {
       def byUser(userId: UserId) = this.filter(_.userId === userId)
     }
+    
+    override def tables: Seq[TableQuery[_ <: Table[_]]] = Seq(userEntities, userProfiles, userEmails)
 }
