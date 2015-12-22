@@ -10,8 +10,15 @@ import pt.org.apec.services.users.common._
 import spray.httpx.PlayJsonSupport
 import scala.concurrent.ExecutionContext
 
+class UsersServiceActor(val dal: Dal[_]) extends HttpServiceActor with UsersService {
+  override val executionContext = context.dispatcher
+  override def receive = runRoute(routes)
+}
+
 trait UsersService extends HttpService with PlayJsonSupport with JsonProtocol with DalComponent {
   implicit val executionContext: ExecutionContext
+
+  def routes = userRoutes
   def userRoutes = path("users") {
     path("register") {
       (post & entity(as[UserRegistration])) { registration =>

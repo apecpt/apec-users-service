@@ -68,5 +68,5 @@ object Dal {
 }
 
 trait DalComponent {
-  def dal: Dal[_] with SchemaManagement with DefaultExecutionContext
+  def dal: Dal[_]
 }
