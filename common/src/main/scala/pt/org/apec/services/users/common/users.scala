@@ -13,3 +13,4 @@ sealed trait AuthenticationResult
 case class AuthenticationSuccess(id: UserId) extends AuthenticationResult
 case class AuthenticationPasswordExpired(id: UserId) extends AuthenticationResult
 case object AuthenticationFailure extends AuthenticationResult
+case class AuthenticationNotActive(userId: UserId) extends AuthenticationResult

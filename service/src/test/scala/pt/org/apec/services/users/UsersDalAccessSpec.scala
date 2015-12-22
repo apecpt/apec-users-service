@@ -16,10 +16,18 @@ class UsersDalAccessSpec extends FlatSpec with Matchers with CleanDatabaseSpec w
     dal.getUserEntityByIdentification("ragb").futureValue shouldBe defined
     dal.getUserEntityByIdentification("ruiandrebatista@gmail.com").futureValue shouldBe defined
   }
+
+  it should "successfully activate users" in {
+    val id = dal.createUser("ragb", "godiva", "ruiandrebatista@gmail.com").futureValue
+    dal.activateUser(id).futureValue shouldBe true
+    dal.activateUser(id).futureValue shouldBe false
+
+  }
+
   it should "successfully authenticate users by username and email" in {
     val id = dal.createUser("ragb", "godiva", "ruiandrebatista@gmail.com").futureValue
+    dal.activateUser(id).futureValue shouldBe true
     dal.authenticate("ruiandrebatista@gmail.com", "godiva").futureValue shouldBe AuthenticationSuccess(id)
-
     dal.authenticate("ragb", "godiva").futureValue shouldBe AuthenticationSuccess(id)
   }
 }

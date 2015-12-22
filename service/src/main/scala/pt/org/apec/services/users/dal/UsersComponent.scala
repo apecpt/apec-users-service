@@ -23,7 +23,7 @@ trait UsersComponent[DT <: JdbcDriver] extends TablesSchema {
   object userEntities extends TableQuery(new UserEntities(_)) {
     def activeUsers = this.filter(_.isActive === true)
     def createUser(username: String) = (map(t => (t.username, t.createdAt)) returning map(_.id)) += (username, DateTime.now)
-    def ativateUser(userId: UserId) = filter(_.id === userId).map(_.isActive).update(true)
+    def ativateUser(userId: UserId) = filter(_.id === userId).filter(_.isActive === false).map(_.isActive).update(true)
   }
 
   class UserPasswords(tag: Tag) extends Table[UserPassword](tag, "user_passwords") {

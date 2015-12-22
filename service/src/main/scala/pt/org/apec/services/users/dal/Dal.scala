@@ -22,8 +22,8 @@ trait Dal[DT <: JdbcDriver] extends JodaSupport[DT] with UsersComponent[DT] with
   def createUser(username: String, password: String, primaryEmail: String): Future[UserId] = {
     val action = (for {
       id <- userEntities.createUser(username)
-      val hashed = BCrypt.hashpw(password, BCrypt.gensalt(config.bcryptFactor))
-      val now = DateTime.now
+      hashed = BCrypt.hashpw(password, BCrypt.gensalt(config.bcryptFactor))
+      now = DateTime.now
       _ <- userPasswords += UserPassword(id, hashed, "bcrypt", now, None, true)
       _ <- userEmails += UserEmail(id, primaryEmail, true, true, None, None)
     } yield (id)).transactionally
@@ -44,12 +44,16 @@ trait Dal[DT <: JdbcDriver] extends JodaSupport[DT] with UsersComponent[DT] with
         userPasswords.getUserCurrentPassword(user.id).map(p => (p.hashedPassword, p.expiresAt)).result.head.map {
           case (hashed, expires) =>
             // TODO handle expiration
-            if (BCrypt.checkpw(password, hashed)) AuthenticationSuccess(user.id) else AuthenticationFailure
+            if (BCrypt.checkpw(password, hashed)) {
+              if (user.isActive) AuthenticationSuccess(user.id) else AuthenticationNotActive(user.id)
+            } else AuthenticationFailure
         }
       } getOrElse (DBIO.successful(AuthenticationFailure))
     }
     database.run(action)
   }
+
+  def activateUser(userId: UserId): Future[Boolean] = database.run(userEntities.ativateUser(userId).map(_ > 0))
 
   override def tables = super[UsersComponent].tables ++ super[AuthorizationComponent].tables
 }
