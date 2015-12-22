@@ -9,3 +9,7 @@ case class UserProfile(userId: UserId, firstName: String, lastName: String, disp
 
 case class UserEmail(userId: UserId, email: String, primary: Boolean, verified: Boolean, verificationToken: Option[String], requestDate: Option[DateTime])
 
+sealed trait AuthenticationResult
+case class AuthenticationSuccess(id: UserId) extends AuthenticationResult
+case class AuthenticationPasswordExpired(id: UserId) extends AuthenticationResult
+case object AuthenticationFailure extends AuthenticationResult

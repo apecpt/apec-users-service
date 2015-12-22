@@ -40,11 +40,12 @@ trait UsersComponent[DT <: JdbcDriver] extends TablesSchema {
 
   object userPasswords extends TableQuery(new UserPasswords(_)) {
     def getUserCurrentPassword(userId: UserId) = filter(_.userId === userId).filter(_.active === true)
+    def activePasswords = filter(_.active === true)
   }
 
   class UserProfiles(tag: Tag) extends Table[UserProfile](tag, "user_profiles") {
     def userId = column[UserId]("user_id")
-    def user = foreignKey("user_id_fk", userId, userEntities)(_.id, ForeignKeyAction.Cascade, ForeignKeyAction.Cascade)
+    def user = foreignKey("user_id_profile_fk", userId, userEntities)(_.id, ForeignKeyAction.Cascade, ForeignKeyAction.Cascade)
     def userIdIndex = index("user_id_idx", userId, true)
     def firstName = column[String]("first_name")
     def lastName = column[String]("last_name")
@@ -56,12 +57,12 @@ trait UsersComponent[DT <: JdbcDriver] extends TablesSchema {
     def * = (userId, firstName, lastName, displayName, country, manualVerification, verificationDocumentUrl, verifiedAt) <> (UserProfile.tupled, UserProfile.unapply _)
   }
   object userProfiles extends TableQuery(new UserProfiles(_)) {
-    val byUser = this.findBy(_.userId)
+    lazy val byUser = this.findBy(_.userId)
   }
 
   class UserEmails(tag: Tag) extends Table[UserEmail](tag, "user_emails") {
     def userId = column[UserId]("user_id")
-    def user = foreignKey("user_id_fk", userId, userEntities)(_.id, ForeignKeyAction.Cascade, ForeignKeyAction.Cascade)
+    def user = foreignKey("user_id_email_fk", userId, userEntities)(_.id, ForeignKeyAction.Cascade, ForeignKeyAction.Cascade)
     def email = column[String]("email")
     def emailIndex = index("user_email_idx", email, true)
     def primary = column[Boolean]("primary")
@@ -72,8 +73,8 @@ trait UsersComponent[DT <: JdbcDriver] extends TablesSchema {
   }
 
   object userEmails extends TableQuery(new UserEmails(_)) {
-    def byUser(userId: UserId) = this.filter(_.userId === userId)
+    def byUser(userId: Rep[UserId]) = this.filter(_.userId === userId).filter(_.verified === true)
   }
 
-  override def tables: Seq[TableQuery[_ <: Table[_]]] = Seq(userEntities, userProfiles, userEmails)
+  override def tables: Seq[TableQuery[_ <: Table[_]]] = Seq(userEntities, userPasswords, userProfiles, userEmails)
 }
