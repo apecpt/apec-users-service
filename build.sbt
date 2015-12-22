@@ -46,7 +46,9 @@ val serviceLibraryDependencies = {
   "com.ruiandrebatista.godiva" %% "godiva-slick" % godivaVersion,
   "com.ruiandrebatista.godiva" %% "godiva-spray" % godivaVersion,
   "com.ruiandrebatista.godiva" %% "godiva-play-json" % godivaVersion,
-  "de.svenkubiak" % "jBCrypt" % "0.4"
+  "de.svenkubiak" % "jBCrypt" % "0.4",
+  "com.h2database" %"h2" % "1.3.170" % "test",
+    "com.github.melrief" %% "pureconfig" % "0.1.5"
 )
 }
 
