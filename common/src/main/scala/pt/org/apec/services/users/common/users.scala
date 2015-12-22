@@ -14,3 +14,9 @@ case class AuthenticationSuccess(id: UserId) extends AuthenticationResult
 case class AuthenticationPasswordExpired(id: UserId) extends AuthenticationResult
 case object AuthenticationFailure extends AuthenticationResult
 case class AuthenticationNotActive(userId: UserId) extends AuthenticationResult
+
+case class UserCredentials(identification: String, password: String)
+case class UserRegistration(username: String, password: String, email: String, firstName: String, lastName: String, displayName: String, country: String)
+
+sealed trait UserRegistrationResult
+case class UserRegistrationSuccess(id: UserId) extends UserRegistrationResult

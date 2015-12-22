@@ -9,7 +9,7 @@ import slick.driver.H2Driver
 import dal._
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait CleanDatabaseSpec extends DalComponent[H2Driver.type] with BeforeAndAfterEach {
+trait CleanDatabaseSpec extends DalComponent with BeforeAndAfterEach {
   this: Suite =>
   private lazy val db = H2Driver.api.Database.forURL("jdbc:h2:mem:test", driver = "org.h2.Driver", keepAliveConnection = true)
   val config = DalConfig(1, 1, 12)

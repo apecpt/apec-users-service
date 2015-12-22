@@ -19,14 +19,14 @@ trait Dal[DT <: JdbcDriver] extends JodaSupport[DT] with UsersComponent[DT] with
 
   // user related methods
   // make email verification working.
-  def createUser(username: String, password: String, primaryEmail: String): Future[UserId] = {
+  def registerUser(r: UserRegistration): Future[UserRegistrationResult] = {
     val action = (for {
-      id <- userEntities.createUser(username)
-      hashed = BCrypt.hashpw(password, BCrypt.gensalt(config.bcryptFactor))
+      id <- userEntities.createUser(r.username)
+      hashed = BCrypt.hashpw(r.password, BCrypt.gensalt(config.bcryptFactor))
       now = DateTime.now
       _ <- userPasswords += UserPassword(id, hashed, "bcrypt", now, None, true)
-      _ <- userEmails += UserEmail(id, primaryEmail, true, true, None, None)
-    } yield (id)).transactionally
+      _ <- userEmails += UserEmail(id, r.email, true, true, None, None)
+    } yield (UserRegistrationSuccess(id))).transactionally
     database.run(action)
   }
 
@@ -67,6 +67,6 @@ object Dal {
   }
 }
 
-trait DalComponent[DT <: JdbcDriver] {
-  def dal: Dal[DT] with SchemaManagement with DefaultExecutionContext
+trait DalComponent {
+  def dal: Dal[_] with SchemaManagement with DefaultExecutionContext
 }
