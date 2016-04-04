@@ -19,7 +19,8 @@ val baseSettings = Seq(
     "-language:implicitConversions",
     "-language:postfixOps",
     "-Xmax-classfile-name", "255" //due to pickling macros
-))
+),
+  resolvers += Resolver.bintrayRepo("batista", "maven"))
 
 val commonSettings = baseSettings ++ Seq(
 libraryDependencies ++= Seq(
